@@ -19,6 +19,7 @@ import (
 	batchv1alpha1 "sdewan.akraino.org/sdewan/api/v1alpha1"
 	"sdewan.akraino.org/sdewan/basehandler"
 	"sdewan.akraino.org/sdewan/cnfprovider"
+	"sdewan.akraino.org/sdewan/openwrt"
 )
 
 // Helper functions to check and remove string from a slice of strings.
@@ -119,7 +120,6 @@ func net2iface(net string, deployment appsv1.Deployment) (string, error) {
 func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, handler basehandler.ISdewanHandler) (ctrl.Result, error) {
 	ctx := context.Background()
 	log := logger.WithValues(handler.GetType(), req.NamespacedName)
-
 	// your logic here
 	during, _ := time.ParseDuration("5s")
 
@@ -151,14 +151,12 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 	delete_timestamp := getDeletionTempstamp(instance)
 
 	if delete_timestamp.IsZero() {
-		fmt.Printf("file: base controller.go\n line:154\n-------------create update CR\n")
 		// creating or updating CR
 		if cnf == nil {
 			// no cnf exists
 			log.Info("No cnf exist, so not create/update " + handler.GetType())
 			return ctrl.Result{}, nil
 		}
-		fmt.Printf("file: base controller.go\n line:184\n-------------update cr to cnf------- CR\n")
 		changed, err := cnf.AddOrUpdateObject(handler, instance)
 		if err != nil {
 			log.Error(err, "Failed to add/update "+handler.GetType())
@@ -177,16 +175,12 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 			}
 		}
 		if changed {
-			fmt.Printf("file: base controller.go\n line:184\n-------------cnf changed ------- CR\n")
 			// instance.Status.AppliedVersion = instance.ResourceVersion
 			// instance.Status.AppliedTime = &metav1.Time{Time: time.Now()}
 			// instance.Status.InSync = true
 			// Status: SdewanStatus
-			fmt.Println("+instance++++++++++++++")
-			fmt.Println(instance)
 			setStatus(instance, &metav1.Time{Time: time.Now()}, true)
 
-			fmt.Printf("file: base controller.go\n line:184\n-------------set status ------- CR\n")
 			err = r.Status().Update(ctx, instance)
 			if err != nil {
 				log.Error(err, "Failed to update status for "+handler.GetType())
@@ -195,7 +189,6 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 		}
 	} else {
 		// deletin CR
-		fmt.Printf("file: base controller.go\n line:193\n-------------delete cr------- CR\n")
 		if cnf == nil {
 			// no cnf exists
 			finalizers := getFinalizers(instance)
@@ -208,25 +201,13 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 			}
 			return ctrl.Result{}, nil
 		}
-		//_, err := cnf.DeleteMwan3Policy(instance)
-		fmt.Printf("file: base controller.go\n line:193\n-------------delete cnf policy------- CR\n")
 		_, err := cnf.DeleteObject(handler, instance)
-		fmt.Printf("file: base controller.go\n line 210\n -------------type of error from cnf.DeleteObject %T", err)
-		fmt.Printf("file: base controller.go\n line 210\n -------------value of error from cnf.DeleteObject %v", err)
 
-		// labels := field.Interface().(map[string]string)
-		// return labels["sdewanPurpose"]
-		// fmt.Printf("delete response  type is %T \n", *err)
-		// fmt.Printf("delete response  type is %v \n", *err)
-		// json.Unmarshal([]byte(
 		if err != nil {
-			value := reflect.ValueOf(err)
-			err_rv := reflect.Indirect(value).FieldByName("Code")
-			err_code := err_rv.Interface().(int)
-			// fmt.Printf("delete response type is %T \n", err_code)
-			// fmt.Printf("delete response value is %v \n", err_code)
-			if err_code == 404 {
-				// if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
+			// value := reflect.ValueOf(err)
+			// err_rv := reflect.Indirect(value).FieldByName("Code")
+			// err_code := err_rv.Interface().(int)
+			if err.(*openwrt.OpenwrtError).Code == 404 {
 				finalizers := getFinalizers(instance)
 				if containsString(finalizers, finalizerName) {
 					// instance.ObjectMeta.Finalizers = removeString(instance.ObjectMeta.Finalizers, finalizerName)

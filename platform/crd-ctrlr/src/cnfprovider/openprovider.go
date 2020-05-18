@@ -2,13 +2,13 @@ package cnfprovider
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"errors"
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	testhandler "sdewan.akraino.org/sdewan/basehandler"
+	basehandler "sdewan.akraino.org/sdewan/basehandler"
 	"sdewan.akraino.org/sdewan/openwrt"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -23,11 +23,6 @@ type OpenWrtProvider struct {
 	K8sClient     client.Client
 }
 
-func printjson(word openwrt.IOpenWrtObject) {
-	policy_obj, _ := json.Marshal(word)
-	fmt.Printf("%s\n", string(policy_obj))
-}
-
 func NewOpenWrt(namespace string, sdewanPurpose string, k8sClient client.Client) (*OpenWrtProvider, error) {
 	reqLogger := log.WithValues("namespace", namespace, "sdewanPurpose", sdewanPurpose)
 	ctx := context.Background()
@@ -37,16 +32,18 @@ func NewOpenWrt(namespace string, sdewanPurpose string, k8sClient client.Client)
 		reqLogger.Error(err, "Failed to get cnf deployment")
 		return nil, client.IgnoreNotFound(err)
 	}
-	if len(deployments.Items) != 1 {
+	if len(deployments.Items) > 1 {
 		reqLogger.Error(nil, "More than one deployment exists")
 		return nil, errors.New("More than one deployment exists")
 	}
-
+	if len(deployments.Items) < 1 {
+		reqLogger.Error(nil, "None deployment exists")
+		return nil, errors.New("None deployment exists")
+	}
 	return &OpenWrtProvider{namespace, sdewanPurpose, deployments.Items[0], k8sClient}, nil
 }
 
-func (p *OpenWrtProvider) AddOrUpdateObject(handler testhandler.ISdewanHandler, instance runtime.Object) (bool, error) {
-	// reqLogger := log.WithValues("Mwan3Policy", mwan3Policy.Name, "cnf", p.Deployment.Name)
+func (p *OpenWrtProvider) AddOrUpdateObject(handler basehandler.ISdewanHandler, instance runtime.Object) (bool, error) {
 	reqLogger := log.WithValues(handler.GetType(), handler.GetName(instance), "cnf", p.Deployment.Name)
 	ctx := context.Background()
 	podList := &corev1.PodList{}
@@ -64,16 +61,12 @@ func (p *OpenWrtProvider) AddOrUpdateObject(handler testhandler.ISdewanHandler, 
 	}
 	cnfChanged := false
 	for _, pod := range podList.Items {
-		// openwrtClient := openwrt.GetOpenwrtClient(pod.Status.PodIP, "root", "")
-		// mwan3 := openwrt.Mwan3Client{OpenwrtClient: openwrtClient}
-		// service := openwrt.ServiceClient{OpenwrtClient: openwrtClient}
-		// runtimePolicy, _ := mwan3.GetPolicy(policy.Name)
 		clientInfo := &openwrt.OpenwrtClientInfo{Ip: pod.Status.PodIP, User: "root", Password: ""}
 		runtime_instance, err := handler.GetObject(clientInfo, new_instance.GetName())
 		changed := false
 
 		// if runtimePolicy == nil {
-		fmt.Println("+openprovider.go++++++++++++++++++++++after GetObject+++++++++++")
+		fmt.Println("+openprovider.go++++++++++++++++++++++GetObject+++++++++++")
 		if err != nil {
 			fmt.Println("+openprovider.go++++++++++++++++++++++Create GetObject+++++++++++")
 			// _, err := mwan3.CreatePolicy(*policy)
@@ -85,7 +78,7 @@ func (p *OpenWrtProvider) AddOrUpdateObject(handler testhandler.ISdewanHandler, 
 			changed = true
 			// } else if reflect.DeepEqual(*runtimePolicy, *policy) {
 		} else if handler.IsEqual(runtime_instance, new_instance) {
-			fmt.Println("+openprovider.go++++++++++++++++++++++IsEqual GetObject+++++++++++")
+			fmt.Println("+openprovider.go++++++++++++++++++++++Object IsEqual +++++++++++")
 			reqLogger.Info("Equal to the runtime instance, so no update")
 		} else {
 			fmt.Println("+openprovider.go++++++++++++++++++++++Update GetObject+++++++++++")
@@ -113,7 +106,7 @@ func (p *OpenWrtProvider) AddOrUpdateObject(handler testhandler.ISdewanHandler, 
 	return cnfChanged, nil
 }
 
-func (p *OpenWrtProvider) DeleteObject(handler testhandler.ISdewanHandler, instance runtime.Object) (bool, error) {
+func (p *OpenWrtProvider) DeleteObject(handler basehandler.ISdewanHandler, instance runtime.Object) (bool, error) {
 	// reqLogger := log.WithValues("Mwan3Policy", mwan3Policy.Name, "cnf", p.Deployment.Name)
 	reqLogger := log.WithValues(handler.GetType(), handler.GetName(instance), "cnf", p.Deployment.Name)
 	ctx := context.Background()

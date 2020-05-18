@@ -35,6 +35,8 @@ import (
 	"strconv"
 )
 
+var mwan3PolicyHandler = new(Mwan3PolicyHandler)
+
 type Mwan3PolicyHandler struct {
 }
 
@@ -130,7 +132,7 @@ type Mwan3PolicyReconciler struct {
 // +kubebuilder:rbac:groups=batch.sdewan.akraino.org,resources=mwan3policies/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch
 func (r *Mwan3PolicyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	return ProcessReconcile(r, r.Log, req, &Mwan3PolicyHandler{})
+	return ProcessReconcile(r, r.Log, req, mwan3PolicyHandler)
 
 	/*
 	   func (r *Mwan3PolicyReconciler) OldReconcile (req ctrl.Request) (ctrl.Result, error) {

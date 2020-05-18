@@ -28,6 +28,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+var mwan3RuleHandler = new(Mwan3RuleHandler)
+
 type Mwan3RuleHandler struct {
 }
 
@@ -52,7 +54,6 @@ func (m *Mwan3RuleHandler) GetInstance(r client.Client, ctx context.Context, req
 
 //
 func (m *Mwan3RuleHandler) Convert(instance runtime.Object, deployment appsv1.Deployment) (openwrt.IOpenWrtObject, error) {
-	fmt.Println("++++++++++++++++++++mwan3rule+++++++++++++++++++convert")
 	rule := instance.(*batchv1alpha1.Mwan3Rule)
 	// openwrtrule := openwrt.SdewanRule{
 	// 	rule.Spec}
@@ -131,7 +132,7 @@ type Mwan3RuleReconciler struct {
 // +kubebuilder:rbac:groups=batch.sdewan.akraino.org,resources=mwan3rules/status,verbs=get;update;patch
 
 func (r *Mwan3RuleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	return ProcessReconcile(r, r.Log, req, &Mwan3RuleHandler{})
+	return ProcessReconcile(r, r.Log, req, mwan3RuleHandler)
 }
 
 func (r *Mwan3RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
