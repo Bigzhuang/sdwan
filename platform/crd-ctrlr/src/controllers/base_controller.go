@@ -10,7 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"reflect"
-	// "sdewan.akraino.org/sdewan/openwrt"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"time"
@@ -67,10 +66,23 @@ func setStatus(instance runtime.Object, t *metav1.Time, isSync bool) {
 	field_rv := reflect.Indirect(value).FieldByName("ResourceVersion")
 	rv := field_rv.Interface().(string)
 	field_status := reflect.Indirect(value).FieldByName("Status")
-	status := field_status.Interface().(batchv1alpha1.SdewanStatus) //undefined: SdewanStatus
+	status := field_status.Interface().(batchv1alpha1.SdewanStatus)
 	status.AppliedVersion = rv
 	status.AppliedTime = t
 	status.InSync = isSync
+	field_status.Set(reflect.ValueOf(status))
+}
+
+func setMessage(instance runtime.Object, t *metav1.Time, isSync bool, msg string) {
+	value := reflect.ValueOf(instance)
+	field_rv := reflect.Indirect(value).FieldByName("ResourceVersion")
+	rv := field_rv.Interface().(string)
+	field_status := reflect.Indirect(value).FieldByName("Status")
+	status := field_status.Interface().(batchv1alpha1.SdewanStatus)
+	status.AppliedVersion = rv
+	status.AppliedTime = t
+	status.InSync = isSync
+	status.Message = msg
 	field_status.Set(reflect.ValueOf(status))
 }
 
@@ -78,7 +90,7 @@ func appendFinalizer(instance runtime.Object, item string) {
 	// to do: ObjectMeta
 	value := reflect.ValueOf(instance)
 	field := reflect.Indirect(value).FieldByName("ObjectMeta")
-	base_obj := field.Interface().(metav1.ObjectMeta) //  undefined: ObjectMeta
+	base_obj := field.Interface().(metav1.ObjectMeta)
 	base_obj.Finalizers = append(base_obj.Finalizers, item)
 	field.Set(reflect.ValueOf(base_obj))
 }
@@ -86,7 +98,7 @@ func appendFinalizer(instance runtime.Object, item string) {
 func removeFinalizer(instance runtime.Object, item string) {
 	value := reflect.ValueOf(instance)
 	field := reflect.Indirect(value).FieldByName("ObjectMeta")
-	base_obj := field.Interface().(metav1.ObjectMeta) //  undefined: ObjectMeta
+	base_obj := field.Interface().(metav1.ObjectMeta)
 	base_obj.Finalizers = removeString(base_obj.Finalizers, item)
 	field.Set(reflect.ValueOf(base_obj))
 }
@@ -112,8 +124,7 @@ func net2iface(net string, deployment appsv1.Deployment) (string, error) {
 			return iface.Interface, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf("No matched network in annotation: %s", net)) //debug undefined: "k8s.io/apimachinery/pkg/api/errors".New
-
+	return "", errors.New(fmt.Sprintf("No matched network in annotation: %s", net))
 }
 
 // Common Reconcile Processing
@@ -140,6 +151,12 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 	cnf, err := cnfprovider.NewOpenWrt(req.NamespacedName.Namespace, purpose, r)
 	if err != nil {
 		log.Error(err, "Failed to get cnf")
+		setMessage(instance, &metav1.Time{Time: time.Now()}, false, err.Error())
+		err = r.Status().Update(ctx, instance)
+		if err != nil {
+			log.Error(err, "Failed to update status for "+handler.GetType())
+			return ctrl.Result{}, err
+		}
 		// A new event are supposed to be received upon cnf ready
 		// so not requeue
 		return ctrl.Result{}, nil
@@ -160,6 +177,7 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 		changed, err := cnf.AddOrUpdateObject(handler, instance)
 		if err != nil {
 			log.Error(err, "Failed to add/update "+handler.GetType())
+			// setMessage(instance, err.(*openwrt.OpenwrtError).Message)
 			return ctrl.Result{RequeueAfter: during}, nil
 		}
 		// if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
@@ -207,6 +225,7 @@ func ProcessReconcile(r client.Client, logger logr.Logger, req ctrl.Request, han
 			// value := reflect.ValueOf(err)
 			// err_rv := reflect.Indirect(value).FieldByName("Code")
 			// err_code := err_rv.Interface().(int)
+			// setMessage(instance, err.(*openwrt.OpenwrtError).Message)
 			if err.(*openwrt.OpenwrtError).Code == 404 {
 				finalizers := getFinalizers(instance)
 				if containsString(finalizers, finalizerName) {

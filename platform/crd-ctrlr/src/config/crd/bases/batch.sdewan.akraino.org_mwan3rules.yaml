@@ -78,6 +78,8 @@ spec:
               type: string
             inSync:
               type: boolean
+            message:
+              type: string
           required:
           - appliedTime
           - appliedVersion

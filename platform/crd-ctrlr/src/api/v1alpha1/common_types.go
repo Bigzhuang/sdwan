@@ -26,4 +26,6 @@ type SdewanStatus struct {
 	AppliedVersion string       `json:"appliedVersion"`
 	AppliedTime    *metav1.Time `json:"appliedTime"`
 	InSync         bool         `json:"inSync"`
+	//+optional
+	Message string `json:"message"`
 }
