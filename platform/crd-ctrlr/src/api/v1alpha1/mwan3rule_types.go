@@ -25,7 +25,6 @@ import (
 // Mwan3RuleSpec defines the desired state of Mwan3Rule
 
 type Mwan3RuleSpec struct {
-	// Members []Mwan3Rule `json:"members"`
 	Policy   string `json:"policy"`
 	SrcIp    string `json:"src_ip"`
 	SrcPort  string `json:"src_port"`

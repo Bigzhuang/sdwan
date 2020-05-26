@@ -82,6 +82,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Mwan3Rule")
 		os.Exit(1)
 	}
+
 	if err = (&controllers.FirewallZoneReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("FirewallZone"),

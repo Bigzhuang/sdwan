@@ -57,8 +57,7 @@ func (m *Mwan3RuleHandler) GetInstance(r client.Client, ctx context.Context, req
 
 func (m *Mwan3RuleHandler) Convert(instance runtime.Object, deployment appsv1.Deployment) (openwrt.IOpenWrtObject, error) {
 	rule := instance.(*batchv1alpha1.Mwan3Rule)
-	// openwrtrule := openwrt.SdewanRule{
-	// 	rule.Spec}
+
 	openwrtrule := openwrt.SdewanRule{
 		Name:     rule.Name,
 		Policy:   rule.Spec.Policy,
@@ -72,8 +71,6 @@ func (m *Mwan3RuleHandler) Convert(instance runtime.Object, deployment appsv1.De
 		Timeout:  rule.Spec.Timeout,
 	}
 	return &openwrtrule, nil
-	// return &openwrt.SdewanRule(instance), nil
-}
 
 func (m *Mwan3RuleHandler) IsEqual(instance1 openwrt.IOpenWrtObject, instance2 openwrt.IOpenWrtObject) bool {
 	Rule1 := instance1.(*openwrt.SdewanRule)
