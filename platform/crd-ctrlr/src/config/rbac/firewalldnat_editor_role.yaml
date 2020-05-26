@@ -1,0 +1,24 @@
+# permissions for end users to edit firewalldnats.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: firewalldnat-editor-role
+rules:
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewalldnats
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewalldnats/status
+  verbs:
+  - get

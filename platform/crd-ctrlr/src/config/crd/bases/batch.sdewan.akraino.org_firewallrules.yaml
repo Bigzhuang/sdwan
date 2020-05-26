@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: mwan3policies.batch.sdewan.akraino.org
+  name: firewallrules.batch.sdewan.akraino.org
 spec:
   group: batch.sdewan.akraino.org
   names:
-    kind: Mwan3Policy
-    listKind: Mwan3PolicyList
-    plural: mwan3policies
-    singular: mwan3policy
+    kind: FirewallRule
+    listKind: FirewallRuleList
+    plural: firewallrules
+    singular: firewallrule
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Mwan3Policy is the Schema for the mwan3policies API
+      description: FirewallRule is the Schema for the firewallrules API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,28 +34,44 @@ spec:
         metadata:
           type: object
         spec:
+          description: FirewallRuleSpec defines the desired state of FirewallRule
           properties:
-            members:
+            dest:
+              type: string
+            dest_ip:
+              type: string
+            dest_port:
+              type: string
+            extra:
+              type: string
+            family:
+              type: string
+            icmp_type:
               items:
-                description: Mwan3PolicySpec defines the desired state of Mwan3Policy
-                properties:
-                  metric:
-                    type: integer
-                  network:
-                    description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of
-                      cluster Important: Run "make" to regenerate code after modifying
-                      this file'
-                    type: string
-                  weight:
-                    type: integer
-                required:
-                - metric
-                - network
-                - weight
-                type: object
+                type: string
               type: array
-          required:
-          - members
+            mark:
+              type: string
+            name:
+              description: Foo is an example field of FirewallRule. Edit FirewallRule_types.go
+                to remove/update
+              type: string
+            proto:
+              type: string
+            set_mark:
+              type: string
+            set_xmark:
+              type: string
+            src:
+              type: string
+            src_ip:
+              type: string
+            src_mac:
+              type: string
+            src_port:
+              type: string
+            target:
+              type: string
           type: object
         status:
           description: status subsource used for Sdewan rule CRDs

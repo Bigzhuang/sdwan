@@ -22,10 +22,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	batchv1alpha1 "sdewan.akraino.org/sdewan/api/v1alpha1"
-	"sdewan.akraino.org/sdewan/controllers"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	batchv1alpha1 "sdewan.akraino.org/sdewan/api/v1alpha1"
+	"sdewan.akraino.org/sdewan/controllers"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -57,6 +58,7 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		LeaderElectionID:   "controller-leader-election-helper",
 		Port:               9443,
 	})
 	if err != nil {
@@ -70,6 +72,54 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Mwan3Policy")
+		os.Exit(1)
+	}
+	if err = (&controllers.Mwan3RuleReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("Mwan3Rule"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Mwan3Rule")
+		os.Exit(1)
+	}
+	if err = (&controllers.FirewallZoneReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("FirewallZone"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "FirewallZone")
+		os.Exit(1)
+	}
+	if err = (&controllers.FirewallRuleReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("FirewallRule"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "FirewallRule")
+		os.Exit(1)
+	}
+	if err = (&controllers.FirewallSNATReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("FirewallSNAT"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "FirewallSNAT")
+		os.Exit(1)
+	}
+	if err = (&controllers.FirewallDNATReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("FirewallDNAT"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "FirewallDNAT")
+		os.Exit(1)
+	}
+	if err = (&controllers.FirewallForwardingReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("FirewallForwarding"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "FirewallForwarding")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

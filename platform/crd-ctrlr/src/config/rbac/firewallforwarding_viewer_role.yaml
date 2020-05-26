@@ -1,0 +1,20 @@
+# permissions for end users to view firewallforwardings.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: firewallforwarding-viewer-role
+rules:
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewallforwardings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewallforwardings/status
+  verbs:
+  - get

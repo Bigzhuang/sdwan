@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: mwan3policies.batch.sdewan.akraino.org
+  name: firewallsnats.batch.sdewan.akraino.org
 spec:
   group: batch.sdewan.akraino.org
   names:
-    kind: Mwan3Policy
-    listKind: Mwan3PolicyList
-    plural: mwan3policies
-    singular: mwan3policy
+    kind: FirewallSNAT
+    listKind: FirewallSNATList
+    plural: firewallsnats
+    singular: firewallsnat
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Mwan3Policy is the Schema for the mwan3policies API
+      description: FirewallSNAT is the Schema for the firewallsnats API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,28 +34,38 @@ spec:
         metadata:
           type: object
         spec:
+          description: FirewallSNATSpec defines the desired state of FirewallSNAT
           properties:
-            members:
-              items:
-                description: Mwan3PolicySpec defines the desired state of Mwan3Policy
-                properties:
-                  metric:
-                    type: integer
-                  network:
-                    description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of
-                      cluster Important: Run "make" to regenerate code after modifying
-                      this file'
-                    type: string
-                  weight:
-                    type: integer
-                required:
-                - metric
-                - network
-                - weight
-                type: object
-              type: array
-          required:
-          - members
+            dest:
+              type: string
+            dest_ip:
+              type: string
+            dest_port:
+              type: string
+            family:
+              type: string
+            mark:
+              type: string
+            name:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "make" to regenerate code after modifying this file'
+              type: string
+            proto:
+              type: string
+            src:
+              type: string
+            src_dip:
+              type: string
+            src_dport:
+              type: string
+            src_ip:
+              type: string
+            src_mac:
+              type: string
+            src_port:
+              type: string
+            target:
+              type: string
           type: object
         status:
           description: status subsource used for Sdewan rule CRDs

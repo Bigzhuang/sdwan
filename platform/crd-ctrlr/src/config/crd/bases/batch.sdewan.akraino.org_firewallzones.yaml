@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: mwan3policies.batch.sdewan.akraino.org
+  name: firewallzones.batch.sdewan.akraino.org
 spec:
   group: batch.sdewan.akraino.org
   names:
-    kind: Mwan3Policy
-    listKind: Mwan3PolicyList
-    plural: mwan3policies
-    singular: mwan3policy
+    kind: FirewallZone
+    listKind: FirewallZoneList
+    plural: firewallzones
+    singular: firewallzone
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Mwan3Policy is the Schema for the mwan3policies API
+      description: FirewallZone is the Schema for the firewallzones API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,28 +34,48 @@ spec:
         metadata:
           type: object
         spec:
+          description: FirewallZoneSpec defines the desired state of FirewallZone
           properties:
-            members:
+            etra_dest:
+              type: string
+            extra_src:
+              type: string
+            family:
+              type: string
+            forward:
+              type: string
+            input:
+              type: string
+            masq:
+              type: string
+            masq_allow_invalid:
+              type: string
+            masq_dest:
               items:
-                description: Mwan3PolicySpec defines the desired state of Mwan3Policy
-                properties:
-                  metric:
-                    type: integer
-                  network:
-                    description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of
-                      cluster Important: Run "make" to regenerate code after modifying
-                      this file'
-                    type: string
-                  weight:
-                    type: integer
-                required:
-                - metric
-                - network
-                - weight
-                type: object
+                type: string
+              type: array
+            masq_src:
+              items:
+                type: string
+              type: array
+            mtu_fix:
+              type: string
+            name:
+              description: Foo is an example field of FirewallZone. Edit FirewallZone_types.go
+                to remove/update
+              type: string
+            network:
+              items:
+                type: string
+              type: array
+            output:
+              type: string
+            subnet:
+              items:
+                type: string
               type: array
           required:
-          - members
+          - network
           type: object
         status:
           description: status subsource used for Sdewan rule CRDs

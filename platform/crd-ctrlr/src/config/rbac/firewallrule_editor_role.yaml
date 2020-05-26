@@ -1,0 +1,24 @@
+# permissions for end users to edit firewallrules.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: firewallrule-editor-role
+rules:
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewallrules
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.sdewan.akraino.org
+  resources:
+  - firewallrules/status
+  verbs:
+  - get

@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: mwan3policies.batch.sdewan.akraino.org
+  name: firewallforwardings.batch.sdewan.akraino.org
 spec:
   group: batch.sdewan.akraino.org
   names:
-    kind: Mwan3Policy
-    listKind: Mwan3PolicyList
-    plural: mwan3policies
-    singular: mwan3policy
+    kind: FirewallForwarding
+    listKind: FirewallForwardingList
+    plural: firewallforwardings
+    singular: firewallforwarding
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Mwan3Policy is the Schema for the mwan3policies API
+      description: FirewallForwarding is the Schema for the firewallforwardings API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,28 +34,18 @@ spec:
         metadata:
           type: object
         spec:
+          description: FirewallForwardingSpec defines the desired state of FirewallForwarding
           properties:
-            members:
-              items:
-                description: Mwan3PolicySpec defines the desired state of Mwan3Policy
-                properties:
-                  metric:
-                    type: integer
-                  network:
-                    description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of
-                      cluster Important: Run "make" to regenerate code after modifying
-                      this file'
-                    type: string
-                  weight:
-                    type: integer
-                required:
-                - metric
-                - network
-                - weight
-                type: object
-              type: array
-          required:
-          - members
+            dest:
+              type: string
+            family:
+              type: string
+            name:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "make" to regenerate code after modifying this file'
+              type: string
+            src:
+              type: string
           type: object
         status:
           description: status subsource used for Sdewan rule CRDs
