@@ -42,12 +42,6 @@ type FirewallSNATSpec struct {
 	Family   string `json:"family,omitempty"`
 }
 
-// FirewallSNATStatus defines the observed state of FirewallSNAT
-type FirewallSNATStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 

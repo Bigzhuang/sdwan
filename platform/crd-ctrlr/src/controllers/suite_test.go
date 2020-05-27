@@ -68,7 +68,6 @@ var _ = BeforeSuite(func(done Done) {
 	err = batchv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
-
 	err = batchv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 

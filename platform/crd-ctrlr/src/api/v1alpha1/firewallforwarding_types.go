@@ -32,12 +32,6 @@ type FirewallForwardingSpec struct {
 	Family string `json:"family,omitempty"`
 }
 
-// FirewallForwardingStatus defines the observed state of FirewallForwarding
-type FirewallForwardingStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 

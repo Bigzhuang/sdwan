@@ -44,12 +44,6 @@ type FirewallZoneSpec struct {
 	ExtraDest        string   `json:"etra_dest,omitempty"`
 }
 
-// FirewallZoneStatus defines the observed state of FirewallZone
-type FirewallZoneStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // FirewallZone is the Schema for the firewallzones API
