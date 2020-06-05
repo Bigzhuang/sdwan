@@ -3,6 +3,7 @@ package cnfprovider
 import (
 	"context"
 	"errors"
+	// "fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -41,8 +42,17 @@ func NewOpenWrt(namespace string, sdewanPurpose string, k8sClient client.Client)
 func (p *OpenWrtProvider) AddOrUpdateObject(handler basehandler.ISdewanHandler, instance runtime.Object) (bool, error) {
 	reqLogger := log.WithValues(handler.GetType(), handler.GetName(instance), "cnf", p.Deployment.Name)
 	ctx := context.Background()
+	ReplicaSetList := &appsv1.ReplicaSetList{}
+	err := p.K8sClient.List(ctx, ReplicaSetList, client.MatchingLabels{"sdewanPurpose": p.SdewanPurpose})
+	if err != nil {
+		return false, err
+	}
 	podList := &corev1.PodList{}
-	err := p.K8sClient.List(ctx, podList, client.MatchingLabels{"sdewanPurpose": p.SdewanPurpose})
+	// deployment and replica are mapped 1 by 1?do we need a check for it?
+	err = p.K8sClient.List(ctx, podList, client.MatchingFields{"OwnBy": ReplicaSetList.Items[0].ObjectMeta.Name})
+	if err != nil {
+		return false, err
+	}
 	if err != nil {
 		return false, err
 	}
