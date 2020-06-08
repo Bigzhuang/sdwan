@@ -41,8 +41,16 @@ func NewOpenWrt(namespace string, sdewanPurpose string, k8sClient client.Client)
 func (p *OpenWrtProvider) AddOrUpdateObject(handler basehandler.ISdewanHandler, instance runtime.Object) (bool, error) {
 	reqLogger := log.WithValues(handler.GetType(), handler.GetName(instance), "cnf", p.Deployment.Name)
 	ctx := context.Background()
+	ReplicaSetList := &appsv1.ReplicaSetList{}
+	err := p.K8sClient.List(ctx, ReplicaSetList, client.MatchingLabels{"sdewanPurpose": p.SdewanPurpose})
+	if err != nil {
+		return false, err
+	}
+	if len(ReplicaSetList.Items) != 1 {
+		return false, errors.New("number of repica and deployment are not 1:1")
+	}
 	podList := &corev1.PodList{}
-	err := p.K8sClient.List(ctx, podList, client.MatchingLabels{"sdewanPurpose": p.SdewanPurpose})
+	err = p.K8sClient.List(ctx, podList, client.MatchingFields{"OwnBy": ReplicaSetList.Items[0].ObjectMeta.Name})
 	if err != nil {
 		return false, err
 	}
