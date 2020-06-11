@@ -140,6 +140,10 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "FirewallForwarding")
 		os.Exit(1)
 	}
+	if err = batchv1alpha1.SetupLabelValidateWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Mwan3Policy")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")

@@ -28,10 +28,13 @@ run: generate fmt vet manifests
 # Install CRDs into a cluster
 install: manifests
 	kustomize build config/crd | kubectl apply -f -
+	kubectl apply -f local/local_for_label_check_webhook_debug.yaml
+	cp -r ../examples/tmp/k8s-webhook-server /tmp/
 
 # Uninstall CRDs from a cluster
 uninstall: manifests
 	kustomize build config/crd | kubectl delete -f -
+	kubectl delete -f local/local_for_label_check_webhook_debug.yaml
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
